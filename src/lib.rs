@@ -10,8 +10,8 @@ pub use node::Node;
 
 mod scheduler;
 
-mod task;
-pub use task::{State, Task, TaskEvent};
+pub mod task;
+pub use task::{State, Task};
 
 mod worker;
 pub use worker::Worker;

@@ -15,8 +15,9 @@ pub struct Node {
 }
 
 impl Node {
+    #[must_use]
     pub fn new(name: String) -> Self {
-        Node {
+        Self {
             name,
             ip: "192.168.1.1".to_string(),
             cores: 4,

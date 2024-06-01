@@ -36,8 +36,9 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn new(name: String, image: String, memory: u16, disk: u16) -> Rc<Task> {
-        Rc::new(Task {
+    #[must_use]
+    pub fn new(name: String, image: String, memory: u16, disk: u16) -> Rc<Self> {
+        Rc::new(Self {
             id: Uuid::new_v4(),
             name,
             state: State::Pending,
@@ -55,7 +56,7 @@ impl Task {
 
 /// Allows the user to perform actions on a running Task such as stopping the Task
 #[derive(Debug)]
-pub struct TaskEvent {
+pub struct Event {
     id: Uuid,
     /// The state the task should transition to
     state: State,
@@ -64,9 +65,10 @@ pub struct TaskEvent {
     task: Rc<Task>,
 }
 
-impl TaskEvent {
-    pub fn new(task: Rc<Task>) -> Rc<TaskEvent> {
-        Rc::new(TaskEvent {
+impl Event {
+    #[must_use]
+    pub fn new(task: Rc<Task>) -> Rc<Self> {
+        Rc::new(Self {
             id: Uuid::new_v4(),
             state: State::Pending,
             timestamp: time::Instant::now(),

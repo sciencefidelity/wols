@@ -22,8 +22,9 @@ pub struct Worker {
 }
 
 impl Worker {
+    #[must_use]
     pub fn new(name: String) -> Self {
-        Worker {
+        Self {
             name,
             queue: VecDeque::new(),
             db: HashMap::new(),
@@ -31,7 +32,8 @@ impl Worker {
         }
     }
 
-    pub fn name(&self) -> &String {
+    #[must_use]
+    pub const fn name(&self) -> &String {
         &self.name
     }
 

@@ -1,4 +1,4 @@
-use crate::task::{Task, TaskEvent};
+use crate::task::{self, Task};
 use crate::Queue;
 
 use std::collections::{HashMap, VecDeque};
@@ -25,7 +25,7 @@ pub struct Manager {
     /// DB of active tasks
     task_db: HashMap<String, Rc<Task>>,
     /// DB of active events
-    event_db: HashMap<String, Rc<TaskEvent>>,
+    event_db: HashMap<String, Rc<task::Event>>,
     /// Holds names of all workers currently in the cluster
     workers: Vec<String>,
     /// Map of jobs assigned to each worker
@@ -35,8 +35,9 @@ pub struct Manager {
 }
 
 impl Manager {
+    #[must_use]
     pub fn new(worker_name: String) -> Self {
-        Manager {
+        Self {
             pending: VecDeque::new(),
             task_db: HashMap::new(),
             event_db: HashMap::new(),

@@ -1,4 +1,4 @@
-use wols::{Manager, Node, Task, TaskEvent, Worker};
+use wols::{task, Manager, Node, Task, Worker};
 
 fn main() {
     let task_name = "Task-1".to_string();
@@ -7,13 +7,13 @@ fn main() {
     let node_name = "Node-1".to_string();
 
     let task = Task::new(task_name, image_name, 1024, 1);
-    let task_event = TaskEvent::new(task.clone());
+    let task_event = task::Event::new(task.clone());
 
-    println!("task: {:?}", task);
-    println!("task: {:?}", task_event);
+    println!("task: {task:?}");
+    println!("task: {task_event:?}");
 
     let worker = Worker::new(worker_name);
-    println!("worker: {:?}", worker);
+    println!("worker: {worker:?}");
     worker.collect_stats();
     worker.run_task();
     worker.start_task();
@@ -21,11 +21,11 @@ fn main() {
 
     let manager = Manager::new(worker.name().clone());
 
-    println!("manager: {:?}", manager);
+    println!("manager: {manager:?}");
     manager.select_worker();
     manager.update_tasks();
     manager.send_work();
 
     let node = Node::new(node_name);
-    println!("node: {:?}", node);
+    println!("node: {node:?}");
 }
