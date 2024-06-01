@@ -6,26 +6,25 @@ fn main() {
     let worker_name = "Worker-1".to_string();
     let node_name = "Node-1".to_string();
 
-    let task = Task::new(task_name, image_name);
+    let task = Task::new(task_name, image_name, 1024, 1);
+    let task_event = TaskEvent::new(task.clone());
+
     println!("task: {:?}", task);
-
-    let task_event = TaskEvent::new(task);
-
     println!("task: {:?}", task_event);
 
     let worker = Worker::new(worker_name);
     println!("worker: {:?}", worker);
-    Worker::collect_stats();
-    Worker::run_task();
-    Worker::start_task();
-    Worker::stop_task();
+    worker.collect_stats();
+    worker.run_task();
+    worker.start_task();
+    worker.stop_task();
 
-    let manager = Manager::new(worker.name);
+    let manager = Manager::new(worker.name().clone());
 
     println!("manager: {:?}", manager);
-    Manager::select_worker();
-    Manager::update_tasks();
-    Manager::send_work();
+    manager.select_worker();
+    manager.update_tasks();
+    manager.send_work();
 
     let node = Node::new(node_name);
     println!("node: {:?}", node);

@@ -1,14 +1,24 @@
 use crate::{task::Task, Queue};
 use std::collections::{HashMap, VecDeque};
-
+use std::rc::Rc;
 use uuid::Uuid;
 
+/// Providing an API primarily used by the Manager for the purpose of
+/// sending tasks asking the Worker to stop tasks and retrieve metrics
+/// about the Workers state.
+///
+/// # Requirements
+///
+/// - Run tasks as Docker containers
+/// - Accept tasks to run from a manager
+/// - Provide statistics to for the purpose of scheduling tasks
+/// - Keep track of tasks and their state
 #[derive(Debug)]
 pub struct Worker {
-    pub name: String,
+    name: String,
     queue: Queue,
-    db: Option<HashMap<Uuid, Task>>,
-    task_count: Option<u32>,
+    db: HashMap<Uuid, Rc<Task>>,
+    task_count: u32,
 }
 
 impl Worker {
@@ -16,24 +26,28 @@ impl Worker {
         Worker {
             name,
             queue: VecDeque::new(),
-            db: None,
-            task_count: None,
+            db: HashMap::new(),
+            task_count: 0,
         }
     }
 
-    pub fn collect_stats() {
+    pub fn name(&self) -> &String {
+        &self.name
+    }
+
+    pub fn collect_stats(&self) {
         println!("I will collect stats");
     }
 
-    pub fn run_task() {
+    pub fn run_task(&self) {
         println!("I will start or stop a task");
     }
 
-    pub fn start_task() {
+    pub fn start_task(&self) {
         println!("I will start a task");
     }
 
-    pub fn stop_task() {
+    pub fn stop_task(&self) {
         println!("I will stop a task");
     }
 }

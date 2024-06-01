@@ -1,8 +1,11 @@
+/// Represents a machine in the cluster
 #[derive(Debug)]
 pub struct Node {
+    /// Name of the node
     name: String,
+    /// Address of the node for the manager to send tasks to
     ip: String,
-    cores: u8,
+    cores: u16,
     memory: u16,
     memory_allocated: Option<u8>,
     disk: u8,
