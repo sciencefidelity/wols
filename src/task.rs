@@ -1,8 +1,16 @@
+use bollard::container::{self, CreateContainerOptions, StartContainerOptions};
+use bollard::image::CreateImageOptions;
+use bollard::secret::ContainerCreateResponse;
+use futures::StreamExt;
+use std::collections::HashMap;
+use std::io;
+use std::rc::Rc;
+use std::sync::Arc;
 use std::time::{self, Instant};
-use std::{collections::HashSet, rc::Rc};
+use tokio::sync::watch;
 use uuid::Uuid;
 
-type PortSet = HashSet<u16>;
+use crate::PortSet;
 
 /// States representing the life-cycle of a task.
 #[derive(Debug)]
@@ -45,7 +53,7 @@ impl Task {
             image,
             memory,
             disk,
-            exposed_ports: HashSet::new(),
+            exposed_ports: HashMap::new(),
             port_bindings: Vec::new(),
             restart_policy: None,
             start_time: None,

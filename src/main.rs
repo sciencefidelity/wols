@@ -1,31 +1,69 @@
-use wols::{task, Manager, Node, Task, Worker};
+use std::sync::Arc;
+use wols::{Config, Docker, DockerResult};
 
-fn main() {
-    let task_name = "Task-1".to_string();
-    let image_name = "Image-1".to_string();
-    let worker_name = "Worker-1".to_string();
-    let node_name = "Node-1".to_string();
+#[tokio::main]
+async fn main() -> Result<(), bollard::errors::Error> {
+    println!("create a test container");
+    let (docker_task, create_result) = create_container().await?;
 
-    let task = Task::new(task_name, image_name, 1024, 1);
-    let task_event = task::Event::new(task.clone());
+    let _ = tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
 
-    println!("task: {task:?}");
-    println!("task: {task_event:?}");
+    println!("stopping container {:?}", create_result.container_id);
 
-    let worker = Worker::new(worker_name);
-    println!("worker: {worker:?}");
-    worker.collect_stats();
-    worker.run_task();
-    worker.start_task();
-    worker.stop_task();
+    stop_container(
+        docker_task,
+        create_result.container_id.expect("missing container id"),
+    )
+    .await?;
 
-    let manager = Manager::new(worker.name().clone());
+    Ok(())
+}
 
-    println!("manager: {manager:?}");
-    manager.select_worker();
-    manager.update_tasks();
-    manager.send_work();
+async fn create_container() -> Result<(Docker, DockerResult), bollard::errors::Error> {
+    let connection = Arc::new(
+        bollard::Docker::connect_with_unix_defaults().expect("unable to connect to docker client"),
+    );
 
-    let node = Node::new(node_name);
-    println!("node: {node:?}");
+    let config = Arc::new(Config::new(
+        "test-container-1".to_owned(),
+        "postgres".to_owned(),
+        vec![
+            "POSTGRES_USER=postgres".into(),
+            "POSTGRES_PASSWORD=password".into(),
+        ],
+    ));
+
+    let docker = Docker::new(connection, config.clone());
+
+    let result = docker.run().await;
+    match result {
+        Ok(res) => {
+            println!(
+                "Container {:?} is running with config {:?}",
+                res.container_id, &config
+            );
+            return Ok((docker, res));
+        }
+        Err(e) => {
+            eprintln!("{e}");
+            return Err(e);
+        }
+    }
+}
+
+async fn stop_container(
+    docker: Docker,
+    id: String,
+) -> Result<DockerResult, bollard::errors::Error> {
+    let result = docker.stop(id.to_owned()).await;
+    match result {
+        Ok(res) => {
+            println!("Container {} has been stopped and removed", &id);
+            return Ok(res);
+        }
+        Err(e) => {
+            eprintln!("{e}");
+            return Err(e);
+        }
+    }
 }

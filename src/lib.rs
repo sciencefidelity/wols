@@ -1,6 +1,10 @@
 #![allow(unused)]
 
-use std::collections::VecDeque;
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::rc::Rc;
+
+mod connection;
+pub use connection::{Client, Config, Docker, DockerResult};
 
 mod manager;
 pub use manager::Manager;
@@ -16,4 +20,5 @@ pub use task::{State, Task};
 mod worker;
 pub use worker::Worker;
 
-type Queue = VecDeque<Task>;
+type Queue = VecDeque<Rc<Task>>;
+type PortSet = HashMap<String, HashMap<(), ()>>;
