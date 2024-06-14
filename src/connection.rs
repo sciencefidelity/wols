@@ -1,8 +1,6 @@
 use crate::PortSet;
-use bollard::container::{
-    self, CreateContainerOptions, LogsOptions, RemoveContainerOptions, StartContainerOptions,
-    StopContainerOptions,
-};
+use bollard::container::{self, CreateContainerOptions, LogsOptions};
+use bollard::container::{RemoveContainerOptions, StartContainerOptions, StopContainerOptions};
 use bollard::secret::ContainerCreateResponse;
 use std::{collections::HashMap, io, sync::Arc};
 
@@ -30,6 +28,7 @@ pub struct Config {
 }
 
 impl Config {
+    #[must_use]
     pub fn new(name: String, image: String, env: Vec<String>) -> Self {
         Self {
             name,
@@ -56,10 +55,17 @@ pub struct Docker {
 }
 
 impl Docker {
+    /// Create a new Docker instance.
+    #[must_use]
     pub fn new(connection: Arc<bollard::Docker>, config: Arc<Config>) -> Self {
         Self { connection, config }
     }
 
+    /// Run a container.
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err` if the container fails to initialize.
     pub async fn run(&self) -> Result<DockerResult, bollard::errors::Error> {
         let options = Some(CreateContainerOptions {
             name: &self.config.name,
@@ -67,10 +73,10 @@ impl Docker {
         });
 
         let config = container::Config {
-            image: Some(self.config.image.to_owned()),
+            image: Some(self.config.image.clone()),
             tty: Some(false),
-            env: Some(self.config.env.to_owned()),
-            exposed_ports: Some(self.config.exposed_ports.to_owned()),
+            env: Some(self.config.env.clone()),
+            exposed_ports: Some(self.config.exposed_ports.clone()),
             ..Default::default()
         };
 
@@ -110,6 +116,11 @@ impl Docker {
         })
     }
 
+    /// Stop a running container
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err` if the container fails to stop.
     pub async fn stop(&self, id: String) -> Result<DockerResult, bollard::errors::Error> {
         println!("attempting to stop container {id}");
 

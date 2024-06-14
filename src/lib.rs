@@ -1,6 +1,7 @@
 #![allow(unused)]
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
+use std::hash::RandomState;
 use std::rc::Rc;
 
 mod connection;
@@ -21,4 +22,5 @@ mod worker;
 pub use worker::Worker;
 
 type Queue = VecDeque<Rc<Task>>;
+#[allow(clippy::zero_sized_map_values)]
 type PortSet = HashMap<String, HashMap<(), ()>>;

@@ -6,7 +6,7 @@ async fn main() -> Result<(), bollard::errors::Error> {
     println!("create a test container");
     let (docker_task, create_result) = create_container().await?;
 
-    let _ = tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+    let () = tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
 
     println!("stopping container {:?}", create_result.container_id);
 
@@ -42,11 +42,11 @@ async fn create_container() -> Result<(Docker, DockerResult), bollard::errors::E
                 "Container {:?} is running with config {:?}",
                 res.container_id, &config
             );
-            return Ok((docker, res));
+            Ok((docker, res))
         }
         Err(e) => {
             eprintln!("{e}");
-            return Err(e);
+            Err(e)
         }
     }
 }
@@ -55,15 +55,15 @@ async fn stop_container(
     docker: Docker,
     id: String,
 ) -> Result<DockerResult, bollard::errors::Error> {
-    let result = docker.stop(id.to_owned()).await;
+    let result = docker.stop(id.clone()).await;
     match result {
         Ok(res) => {
             println!("Container {} has been stopped and removed", &id);
-            return Ok(res);
+            Ok(res)
         }
         Err(e) => {
             eprintln!("{e}");
-            return Err(e);
+            Err(e)
         }
     }
 }
